@@ -1,0 +1,25 @@
+name="musl"
+version="1.2.6"
+source="https://musl.libc.org/releases/musl-1.2.6.tar.gz"
+sha256="260127b07a6cb72b70264fceafbc509e7da0cfde8e701a1fb44247859bc489a5c6"
+depends=()
+
+build() {
+    cp -f "$port_dir"/files/cdefs.h "$port_dir"/files/queue.h \
+          "$port_dir"/files/tree.h \
+          "$port_dir"/files/getconf.c "$port_dir"/files/getent.c .
+    ./configure \
+        --prefix=/usr \
+        --syslibdir=/usr/lib
+    make
+}
+
+install() {
+    make DESTDIR="$DESTDIR" install
+    mkdir -p "$DESTDIR/usr/bin"
+    ln -s /usr/lib/ld-musl-x86_64.so.1 "$DESTDIR/usr/bin/ldd"
+    ln -sf libc.so "$DESTDIR/usr/lib/ld-musl-x86_64.so.1"
+    cp -f cdefs.h queue.h tree.h "$DESTDIR/usr/include/sys"
+    cc getconf.c -o "$DESTDIR/usr/bin/getconf"
+    cc getent.c  -o "$DESTDIR/usr/bin/getent"
+}
