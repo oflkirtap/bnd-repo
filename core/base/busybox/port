@@ -1,0 +1,49 @@
+name="busybox"
+version="1.38.0"
+source="https://busybox.net/downloads/busybox-1.38.0.tar.bz2"
+sha256="04de7affa61579a9f495eb84d35305ba7f9d21760d717a8fabdee3749bf653e902"
+depends=()
+
+build() {
+    cp -f "$port_dir"/files/.config     .
+    cp -f "$port_dir"/files/.config-suid .
+    cp -f "$port_dir"/files/*.run        .
+    cp -f "$port_dir"/files/mdev.conf    .
+
+    sed -e "s#= g[c+][c+]#= $CC#g" \
+        -e "s#\(\$(CROSS_COMPILE)\)gcc#\1$CC#g" Makefile > _
+    mv -f _ Makefile
+
+    make HOSTCC="$CC"
+}
+
+install() {
+    # regular build (no suid)
+    make CONFIG_PREFIX="$DESTDIR/usr" install
+    mv "$DESTDIR/usr/bin/busybox" "$DESTDIR/usr/bin/busybox-nosuid"
+
+    # suid build
+    cp -f .config-suid .config
+    make HOSTCC="$CC"
+    make CONFIG_PREFIX="$DESTDIR/usr" install
+    mv -f "$DESTDIR/usr/bin/busybox" "$DESTDIR/usr/bin/busybox-suid"
+    mv -f "$DESTDIR/usr/bin/busybox-nosuid" "$DESTDIR/usr/bin/busybox"
+
+    # create symlinks
+    "$DESTDIR/usr/bin/busybox" --list | while read -r bin; do
+        ln -s busybox "$DESTDIR/usr/bin/$bin"
+    done
+    "$DESTDIR/usr/bin/busybox-suid" --list | while read -r bin; do
+        ln -s busybox-suid "$DESTDIR/usr/bin/$bin"
+    done
+    chmod u+s "$DESTDIR/usr/bin/busybox-suid"
+
+    # runit service dirs
+    mkdir -p "$DESTDIR/etc/acpi"
+    for s in acpid crond syslogd mdev ntpd; do
+        mkdir -p "$DESTDIR/etc/sv/$s"
+        cp -f "$s.run" "$DESTDIR/etc/sv/$s/run"
+        ln -sf "/run/runit/supervise.$s" "$DESTDIR/etc/sv/$s/supervise"
+    done
+    cp -f mdev.conf "$DESTDIR/etc/mdev.conf"
+}

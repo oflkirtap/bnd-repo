@@ -1,0 +1,35 @@
+name="git"
+version="2.51.0"
+source="https://www.kernel.org/pub/software/scm/git/git-2.51.0.tar.xz"
+sha256=""
+depends=("curl" "zlib")
+
+build() {
+    make \
+        prefix=/usr \
+        gitexecdir=/usr/lib/git-core \
+        perllibdir=/usr/share/perl5 \
+        NO_GETTEXT=1 \
+        NO_PYTHON=1 \
+        NO_TCLTK=1 \
+        NO_PERL=1 \
+        NO_EXPAT=1 \
+        NO_ICONV=1 \
+        USE_LIBPCRE=0 \
+        CURL_CONFIG=curl-config
+}
+
+install() {
+    make \
+        prefix=/usr \
+        gitexecdir=/usr/lib/git-core \
+        perllibdir=/usr/share/perl5 \
+        NO_GETTEXT=1 \
+        NO_PYTHON=1 \
+        NO_TCLTK=1 \
+        NO_PERL=1 \
+        NO_EXPAT=1 \
+        NO_ICONV=1 \
+        DESTDIR="$DESTDIR" \
+        install
+}

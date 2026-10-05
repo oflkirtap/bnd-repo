@@ -1,0 +1,7 @@
+name="base-system"
+version="1.0"
+source=""
+depends=()
+
+build()   { :; }
+install() { :; }

@@ -1,0 +1,22 @@
+name="openssl"
+version="4.0.3"
+source="https://github.com/openssl/openssl/releases/download/openssl-4.0.3/openssl-4.0.3.tar.gz"
+sha256="92a6d5e2e74a989c1405de8a7770c7fb469ddcf9c9ed74b768d51c274af6487b58"
+depends=("certs")
+
+build() {
+    ./Configure \
+        --prefix=/usr \
+        --openssldir=/etc/ssl \
+        --libdir=lib \
+        no-ssl3 \
+        no-weak-ssl-ciphers \
+        shared
+    make
+}
+
+install() {
+    make DESTDIR="$DESTDIR" install_sw
+    make DESTDIR="$DESTDIR" install_ssldirs
+    rmdir "$DESTDIR/etc/ssl/certs" 2>/dev/null || true
+}

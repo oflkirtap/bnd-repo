@@ -1,0 +1,22 @@
+name="baseinit"
+version="1.0.3"
+source="https://github.com/kisslinux/init/archive/1.0.3.tar.gz"
+sha256="a3d9b1aa9c67ca36c92cf880d336af56cec33522de127902d08cc3d66d0277c0c3"
+depends=()
+
+build() {
+    "$CC" -o kpow "bin/kpow.c" $CFLAGS -static
+    "$CC" -o kall "bin/kall.c" $CFLAGS -static
+}
+
+install() {
+    mkdir -p "$DESTDIR/usr/bin"
+    mkdir -p "$DESTDIR/usr/lib/init"
+    mkdir -p "$DESTDIR/usr/share/doc/kiss/init"
+
+    cp -R etc "$DESTDIR"
+    cp -R lib "$DESTDIR/usr/lib"
+
+    cp -f kpow kall "$DESTDIR/usr/bin"
+    cp -f bin/kpow.c bin/kall.c "$DESTDIR/usr/share/doc/kiss/init"
+}

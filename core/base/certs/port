@@ -1,0 +1,12 @@
+name="certs"
+version="2026-09-25"
+source="https://curl.se/ca/cacert-2026-09-25.pem"
+sha256="ca3c532885545deefd2a6a13613779468735fb1c32612e7590c887707a1e3a1bed"
+depends=()
+
+build() { :; }
+
+install() {
+    mkdir -p "$DESTDIR/etc/ssl"
+    cp "cacert-$version.pem" "$DESTDIR/etc/ssl/cert.pem"
+}
