@@ -1,0 +1,16 @@
+name="linux-headers"
+version="6.18.14"
+source="https://mirrors.edge.kernel.org/pub/linux/kernel/v6.x/linux-6.18.14.tar.xz"
+sha256="8435be2bfdc182276e11c6a10c75db83cb5f900422ed85107195012921bc5c2f2c"
+depends=()
+
+build() {
+    make HOSTCC="$CC" headers
+}
+
+install() {
+    find usr/include -name '*.h' -type f | while read -r file; do
+        mkdir -p "$DESTDIR/${file%/*}"
+        cp -f "$file" "$DESTDIR/$file"
+    done
+}

@@ -1,0 +1,52 @@
+name="binutils"
+version="2.45"
+source="https://ftp.gnu.org/gnu/binutils/binutils-2.45.tar.xz"
+sha256="REPLACE_WITH_REAL_SHA256"
+depends=("zlib")
+builddeps=("flex")
+
+build() {
+    cat > makeinfo <<'EOF'
+#!/bin/sh
+printf 'makeinfo (GNU texinfo) 5.2\n'
+EOF
+    chmod +x makeinfo
+    export PATH="$PATH:$PWD"
+
+    ./configure \
+        --prefix=/usr \
+        --with-lib-path=/usr/lib:/usr/local/lib \
+        --enable-targets=x86_64-pep \
+        --enable-deterministic-archives \
+        --enable-gold \
+        --enable-lto \
+        --enable-ld=default \
+        --enable-plugins \
+        --disable-multilib \
+        --disable-werror \
+        --disable-gdb \
+        --disable-nls \
+        --disable-readline \
+        --disable-gprof \
+        --disable-gprofng \
+        --with-mmap \
+        --with-system-zlib \
+        --without-zstd
+
+    make configure-host
+    make tooldir=/usr
+}
+
+install() {
+    [ -x makeinfo ] || {
+        cat > makeinfo <<'EOF'
+#!/bin/sh
+printf 'makeinfo (GNU texinfo) 5.2\n'
+EOF
+        chmod +x makeinfo
+    }
+    export PATH="$PATH:$PWD"
+
+    make tooldir=/usr DESTDIR="$DESTDIR" install
+    ln -sf ld.bfd "$DESTDIR/usr/bin/ld"
+}

@@ -1,0 +1,17 @@
+name="gmp"
+version="6.3.0"
+source="https://gmplib.org/download/gmp/gmp-6.3.0.tar.xz"
+sha256="fffe4996713928ae19331c8ef39129e46d3bf5b7182820656fd4639435cd83a40d"
+depends=()
+
+build() {
+    export CFLAGS="$CFLAGS -std=c17"
+    ./configure \
+        --prefix=/usr \
+        --localstatedir=/var/state/gmp \
+        --enable-cxx \
+        --enable-fat \
+        --with-pic
+    make
+}
+install() { make DESTDIR="$DESTDIR" install; }

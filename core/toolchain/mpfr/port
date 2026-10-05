@@ -1,0 +1,11 @@
+name="mpfr"
+version="4.2.2"
+source="https://www.mpfr.org/mpfr-4.2.2/mpfr-4.2.2.tar.xz"
+sha256="11d59d061ef8db588650bc7dc5172594a6e5aad013994801c6f63011a62b191dd9"
+depends=("gmp")
+
+build() {
+    ./configure --prefix=/usr --enable-shared --enable-thread-safe
+    make
+}
+install() { make DESTDIR="$DESTDIR" install; }
